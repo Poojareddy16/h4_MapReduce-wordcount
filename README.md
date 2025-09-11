@@ -12,67 +12,69 @@ Reducer (WordReducer.java): Aggregates counts for each word and outputs (word, t
 🚀 **Execution Steps**
 
 **1.Start Hadoop Cluster**
-
+```bash
 docker compose up -d
-
+```
 
 **2.Build the Project with Maven**
-
+```bash
 mvn clean package
-
+```
 
 **3.This creates the JAR at:**
+```bash
 target/WordCountUsingHadoop-0.0.1-SNAPSHOT.jar
+```
 
 **4.Copy JAR and Input File to Container**
-
+```bash
 docker cp target/WordCountUsingHadoop-0.0.1-SNAPSHOT.jar resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
 docker cp shared-folder/input/data/input.txt resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/
-
+```
 
 **5.Enter the ResourceManager Container**
-
+```bash
 docker exec -it resourcemanager /bin/bash
 cd /opt/hadoop-3.2.1/share/hadoop/mapreduce/
-
+```
 
 **6.Load Input into HDFS**
-
+```bash
 hadoop fs -mkdir -p /input/data
 hadoop fs -put -f ./input.txt /input/data
-
+```
 
 **7.Run the MapReduce Job**
-
+```bash
 hadoop jar WordCountUsingHadoop-0.0.1-SNAPSHOT.jar com.example.controller.Controller /input/data/input.txt /output1
-
+```
 
 ⚠️ If /output1 already exists, remove it with:
-
+```bash
 hadoop fs -rm -r /output1
-
+```
 
 **8.View Job Output in HDFS**
-
+```bash
 hadoop fs -cat /output1/*
-
+```
 
 **9.Copy Output from HDFS to Local Machine**
 Inside container:
-
+```bash
 hdfs dfs -get /output1 /opt/hadoop-3.2.1/share/hadoop/mapreduce/
 exit
-
+```
 
 Outside container (PowerShell):
-
+```bash
 docker cp resourcemanager:/opt/hadoop-3.2.1/share/hadoop/mapreduce/output1/ shared-folder/output/
-
+```
 
 **10.Final results will be available in:**
-
+```bash
 shared-folder/output/part-r-00000
-
+```
 ⚡ **Challenges & Solutions**
 
 Maven not recognized → fixed by adding bin to PATH.
